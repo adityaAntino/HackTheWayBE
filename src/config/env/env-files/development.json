@@ -1,0 +1,8 @@
+{
+	"envName": "Development",
+	"port": 4000,
+	"db_connectionString": {
+		"db": "mongodb+srv://kshitijbajpai:Cfgf41MqL40vqEoe@cluster0.djrj0f4.mongodb.net/"
+	},
+	"JWT_TOKEN": "PHg4zQ}Cj^sEGev$Fn#3NTha=O,BQ&azRZs%Qi)B3G=pRaV(1~"
+}
