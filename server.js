@@ -1,10 +1,10 @@
-const app = express();
-const server = require("http").createServer(app);
-
 const express = require("./src/config/express");
 const config = require("./src/config/env/config");
 const connectDB = require("./src/config/database/dbConnection");
 const terminate = require("./terminate");
+
+const app = express();
+const server = require("http").createServer(app);
 
 // clientConnection();
 connectDB();

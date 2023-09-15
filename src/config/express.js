@@ -13,7 +13,7 @@ module.exports = () => {
 	app.use(responseHandler());
 	app.use(logger("dev"));
 
-	require("../app/common/authentication/auth.routes")(app);
+	// require("../app/common/authentication/auth.routes")(app);
 
 	const PORT = config.port ? config.port : process.env.PORT;
 	app.get("/", (req, res) => {
