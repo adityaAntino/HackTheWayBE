@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const logger = require("./src/app/common/logger/logs");
 const env = require("./src/config/env/config");
-const { safeClose } = require("./src/app/common/cache/cache");
+
 
 //Error model created to store crashing error
 const ErrorSchema = mongoose.Schema(
@@ -24,7 +24,7 @@ function terminate(server, options = { coredump: false, timeout: 500 }) {
 	return (code, reason) => (err, promise) => {
 		if (err && err instanceof Error) {
 			logger.error(env.envName, err.message, err.stack);
-			safeClose();
+
 			errorModel.create({
 				environment: env.envName,
 				message: err.message,
