@@ -16,6 +16,7 @@ const auctionSchema = new mongoose.Schema(
 		},
 		chain: {
 			type: Array,
+			select: false,
 		},
 		winningBid: {
 			type: {

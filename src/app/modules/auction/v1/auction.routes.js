@@ -12,6 +12,7 @@ userRouter.post("/", _controller.InitializeAuction);
 userRouter.post("/bid", _controller.BidOnAuction);
 userRouter.post("/bid/close", _controller.CloseAuction);
 userRouter.get("/", _controller.FetchAllMyAuctions);
+userRouter.get("/open", _controller.FetchCurrentRunningAuctions);
 
 // adminRouter.get("/", _controller.FetchAllAuctions);
 

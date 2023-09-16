@@ -24,7 +24,6 @@ const editAuction = async function (id, { chain, winningBid }) {
 };
 
 const fetchAllAuctions = async function (userId) {
-	console.log(userId);
 	const auctions = await AuctionModel.find({ auctioneer: mongoose.Types.ObjectId(userId) });
 
 	if (!auctions) return Response(false, "Error in fetching auction");

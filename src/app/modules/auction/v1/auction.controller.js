@@ -3,14 +3,17 @@ const { Wrapper } = require("../../../common/helpers/serviceResponse.Handler");
 const { Blockchain, Block } = require("../../../common/utils/blockchain/blockchain");
 const { blockChainStatus } = require("../../../common/utils/enums");
 const UserService = require("../../user/v1/user.service");
+const moment = require("moment");
 
 let auctionChain = null;
 
 const InitializeAuction = Wrapper(async function (req, res) {
 	if (auctionChain) return res.error.NotFound("One auction is already going on");
 
-	const { itemName, initialPrice, itemInfo } = req.body;
+	const { itemName, initialPrice, itemInfo, duration } = req.body;
 	const userId = req.user._id;
+
+	const endtime = moment().add(duration, "hours").format("DD-MM-YYYYTHH:mm:ss") + "Z";
 
 	const auction = await _service.addNewAuction({ itemName, initialPrice, itemInfo, userId });
 
@@ -20,6 +23,7 @@ const InitializeAuction = Wrapper(async function (req, res) {
 		itemName,
 		initialPrice,
 		itemInfo,
+		endTime: endtime,
 		auctionId: auction.data._id,
 		auctioneer: userId,
 		status: blockChainStatus.start,
@@ -35,6 +39,11 @@ const BidOnAuction = Wrapper(async function (req, res) {
 	const userId = req.user._id;
 
 	const auctioneerId = auctionChain.getGenesisBlock().data.auctioneer;
+
+	const endtime = auctionChain.getGenesisBlock().data.endTime;
+	const currentTime = moment().format("DD-MM-YYYYTHH:mm:ss") + "Z";
+
+	if (endtime < currentTime) return res.error.BadRequest("Bidding is now closed");
 
 	if (userId.toString() == auctioneerId.toString())
 		return res.error.NotAcceptable("You cannot place bid in your own auction");
@@ -96,4 +105,19 @@ const FetchAllMyAuctions = Wrapper(async function (req, res) {
 	res.success.OK("Fetched Successfully", fetchMyAuctions.data);
 });
 
-module.exports = { InitializeAuction, BidOnAuction, CloseAuction, FetchAllMyAuctions };
+const FetchCurrentRunningAuctions = Wrapper(async function (req, res) {
+	if (!auctionChain) return res.error.NotFound("No auction Found");
+
+	const auctionData = auctionChain.getGenesisBlock().data;
+
+	const arrToReturn = [];
+	let data = 7;
+
+	while (data > 0) {
+		arrToReturn.push(auctionData);
+		data -= 1;
+	}
+	res.success.OK("Fetched Succefully", arrToReturn);
+});
+
+module.exports = { InitializeAuction, BidOnAuction, CloseAuction, FetchAllMyAuctions, FetchCurrentRunningAuctions };
