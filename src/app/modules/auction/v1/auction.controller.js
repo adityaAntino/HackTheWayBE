@@ -7,11 +7,7 @@ const { blockChainStatus } = require("../../../common/utils/enums");
 const UserService = require("../../user/v1/user.service");
 const { getValue, setEntry, deleteEntry } = require("../../../common/cache/cache");
 
-let auctionChain = null;
-
 const InitializeAuction = Wrapper(async function (req, res) {
-	if (auctionChain) return res.error.NotFound("One auction is already going on");
-
 	const { itemName, initialPrice, itemInfo, duration } = req.body;
 	const userId = req.user._id;
 
