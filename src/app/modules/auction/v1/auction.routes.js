@@ -10,6 +10,7 @@ const adminRouter = express.Router();
 
 userRouter.post("/", _controller.InitializeAuction);
 userRouter.post("/:auctionId/bid", _controller.BidOnAuction);
+userRouter.get("/:auctionId/bid-count", _controller.GetBidCount);
 userRouter.post("/:auctionId/close", _controller.CloseAuction);
 userRouter.get("/", _controller.FetchAllMyAuctions);
 userRouter.get("/bids", _controller.FetchAllMyBids);

@@ -132,17 +132,7 @@ const FetchCurrentRunningAuctions = Wrapper(async function (req, res) {
 	res.success.OK("Fetched Succefully", allRunningBlockchains.data);
 });
 
-const closeAuctionAndMarkNull = async function (userData, bidAmount, blockchain) {
-	const auctionId = blockchain.getGenesisBlock().data.auctionId;
 
-	await _service.editAuction(auctionId, {
-		chain: blockchain.getChain(),
-		winningBid: { user: userData.data._id, amount: bidAmount },
-		status: blockChainStatus.end,
-	});
-
-	deleteEntry(auctionId);
-};
 
 const FetchAllAuctions = Wrapper(async function (req, res) {
 	const { page = 1, limit = 15, match = "", status = blockChainStatus.end } = req.query;
@@ -156,6 +146,28 @@ const FetchAllAuctions = Wrapper(async function (req, res) {
 	res.success.OK("Success full", response.data[0]);
 });
 
+const GetBidCount = Wrapper(async function (req, res) {
+	const id = req.params.auctionId;
+	const blockchain = getValue(id);
+	if (!blockchain) return res.error.NotFound("No auction Found");
+
+	const response = blockchain.getChain().length - 1;
+	if (!response) return res.error.BadRequest(response.message);
+
+	res.success.OK("Fetched count", { count: response });
+});
+
+const closeAuctionAndMarkNull = async function (userData, bidAmount, blockchain) {
+	const auctionId = blockchain.getGenesisBlock().data.auctionId;
+
+	await _service.editAuction(auctionId, {
+		chain: blockchain.getChain(),
+		winningBid: { user: userData.data._id, amount: bidAmount },
+		status: blockChainStatus.end,
+	});
+
+	deleteEntry(auctionId);
+};
 module.exports = {
 	InitializeAuction,
 	BidOnAuction,
@@ -164,4 +176,5 @@ module.exports = {
 	FetchCurrentRunningAuctions,
 	FetchAllMyBids,
 	FetchAllAuctions,
+	GetBidCount,
 };
