@@ -144,6 +144,18 @@ const closeAuctionAndMarkNull = async function (userData, bidAmount, blockchain)
 	deleteEntry(auctionId);
 };
 
+const FetchAllAuctions = Wrapper(async function (req, res) {
+	const { page = 1, limit = 15, match = "", status = blockChainStatus.end } = req.query;
+	const offset = (page - 1) * limit;
+
+	const response = await _service.FetchAllAuctions(offset, Number(limit), match, {
+		status,
+	});
+
+	if (response.status === false) return res.error.NotFound("No data found for given parameters");
+	res.success.OK("Success full", response.data[0]);
+});
+
 module.exports = {
 	InitializeAuction,
 	BidOnAuction,
@@ -151,4 +163,5 @@ module.exports = {
 	FetchAllMyAuctions,
 	FetchCurrentRunningAuctions,
 	FetchAllMyBids,
+	FetchAllAuctions,
 };

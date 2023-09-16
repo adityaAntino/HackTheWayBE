@@ -69,4 +69,62 @@ const addBidder = async function (auctionId, userId) {
 	if (!auction) Response(false, "No auction found");
 	return Response(true, "Bidder is added", auction);
 };
-module.exports = { addNewAuction, editAuction, fetchAllAuctions, addBidder, fetchAllBids, fetchAuctions };
+
+
+const FetchAllAuctions = async function (offset, limit, match, query) {
+	const auctions = await AuctionModel.aggregate([
+		{
+			$match: query,
+		},
+		{
+			$lookup: {
+				from: "users",
+				localField: "auctioneer",
+				foreignField: "_id",
+				as: "auctioneer",
+			},
+		},
+		{
+			$unwind: { path: "$auctioneer" },
+		},
+		{
+			$match: {
+				"auctioneer.name": { $regex: `^${match}`, $options: "i" },
+			},
+		},
+		{
+			$facet: {
+				metadata: [{ $count: "total" }],
+				auctions: [
+					{ $skip: offset },
+					{ $limit: limit },
+					{
+						$project: {
+							chain: 0,
+							bidder: 0,
+						},
+					},
+				],
+			},
+		},
+		{
+			$addFields: {
+				metadata: {
+					$cond: [{ $eq: ["$metadata", []] }, [{ total: 0 }], "$metadata"],
+				},
+			},
+		},
+	]);
+	if (auctions.length) Response(false, "No auctions found");
+	return Response(true, "auctions fetched", auctions);
+};
+
+module.exports = {
+	addNewAuction,
+	editAuction,
+	fetchAllAuctions,
+	addBidder,
+	fetchAllBids,
+	fetchAuctions,
+	FetchAllAuctions,
+};

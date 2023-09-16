@@ -15,7 +15,7 @@ userRouter.get("/", _controller.FetchAllMyAuctions);
 userRouter.get("/bids", _controller.FetchAllMyBids);
 userRouter.get("/open", _controller.FetchCurrentRunningAuctions);
 
-// adminRouter.get("/", _controller.FetchAllAuctions);
+adminRouter.get("/", _controller.FetchAllAuctions);
 
 module.exports = (app) => {
 	app.use(prefix, (req, res, next) => {

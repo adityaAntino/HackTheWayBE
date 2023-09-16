@@ -5,7 +5,8 @@ const PatchUser = Wrapper(async function (req, res) {
 	const { name, email, gender } = req.body;
 	const userId = req.user._id;
 
-	const response = _service.editUser(userId, { name, email, gender });
+	const response = await _service.editUser(userId, { name, email, gender });
+	
 
 	if (response.status === false) return res.error.BadRequest(response.message);
 
