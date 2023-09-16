@@ -36,7 +36,11 @@ const fetchAllBids = async function (userId) {
 	let auctions = await AuctionModel.find({ bidder: mongoose.Types.ObjectId(userId) });
 
 	auctions = auctions.map((elem) => {
-		return { ...elem._doc, won: elem.winningBid?.user.toString() == userId.toString() };
+		return {
+			...elem._doc,
+			auctioneer: elem.auctioneer.name,
+			won: elem.winningBid?.user.toString() == userId.toString(),
+		};
 	});
 
 	if (!auctions) return Response(false, "Error in fetching auction");
@@ -136,6 +140,14 @@ const FetchAllAuctions = async function (offset, limit, match, query) {
 	return Response(true, "auctions fetched", auctions);
 };
 
+const GetBiddersCount = async function (id) {
+	const auctions = await AuctionModel.findById(mongoose.Types.ObjectId(id)).select("bidder");
+
+	if (!auctions) return Response(false, "Error in fetching auction");
+	const count = auctions.bidder.length;
+	return Response(true, "Auction is fetched", { count });
+};
+
 module.exports = {
 	addNewAuction,
 	editAuction,
@@ -145,4 +157,5 @@ module.exports = {
 	fetchAuctions,
 	FetchAllAuctions,
 	auctionStatusCount,
+	GetBiddersCount,
 };

@@ -127,12 +127,10 @@ const FetchAllAuctions = Wrapper(async function (req, res) {
 
 const GetBidCount = Wrapper(async function (req, res) {
 	const id = req.params.auctionId;
-	const blockchain = getValue(id);
-	if (!blockchain) return res.error.NotFound("No auction Found");
 
-	const response = blockchain.getChain().length - 1;
+	const response = await _service.GetBiddersCount(id);
 
-	res.success.OK("Fetched count", { count: response });
+	res.success.OK("Fetched count", { count: response.data.count });
 });
 
 const closeAuctionAndMarkNull = async function (userData, bidAmount, blockchain) {
