@@ -2,8 +2,11 @@ const mongoose = require("mongoose");
 const AuctionModel = require("./auction.model");
 const { Response } = require("../../../common/helpers/serviceResponse.Handler");
 
-const addNewAuction = async function ({ itemName, initialPrice, itemInfo }) {
-	const auction = await AuctionModel.create({ itemName, initialPrice, itemInfo });
+const addNewAuction = async function ({ itemName, initialPrice, itemInfo, userId }) {
+	const auction = await AuctionModel.create({
+		auctioneer: mongoose.Types.ObjectId(userId),
+		itemDescription: { itemName, initialPrice, itemInfo },
+	});
 
 	if (!auction) return Response(false, "Error in creating new auction");
 	return Response(true, "New Auction Created", auction);

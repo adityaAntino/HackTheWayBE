@@ -1,6 +1,7 @@
 const express = require("express");
 
 const _controller = require("./auction.controller");
+const { VerifyToken } = require("../../../common/authentication/v1/auth.controller");
 
 const prefix = "/api/v1/auction";
 
@@ -10,17 +11,20 @@ const adminRouter = express.Router();
 userRouter.post("/", _controller.InitializeAuction);
 userRouter.post("/bid", _controller.BidOnAuction);
 userRouter.post("/bid/close", _controller.CloseAuction);
+userRouter.get("/", _controller.FetchAllMyAuctions);
+
+adminRouter.get("/", _controller.FetchAllAuctions);
 
 module.exports = (app) => {
 	app.use(prefix, (req, res, next) => {
 		const apiSource = req.get("Platform");
 
 		const UserRoutes = function () {
-			userRouter(req, res, next);
+			VerifyToken(req, res, () => userRouter(req, res, next));
 		};
 
 		const AdminRoutes = function () {
-			adminRouter(req, res, next);
+			VerifyToken(req, res, () => userRouter(req, res, next));
 		};
 
 		if (apiSource === "user") UserRoutes();

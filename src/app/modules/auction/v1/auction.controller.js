@@ -10,8 +10,9 @@ const InitializeAuction = Wrapper(async function (req, res) {
 	if (auctionChain) return res.error.NotFound("One auction is already going on");
 
 	const { itemName, initialPrice, itemInfo } = req.body;
+	const userId = req.user._id;
 
-	const auction = await _service.addNewAuction({ itemName, initialPrice, itemInfo });
+	const auction = await _service.addNewAuction({ itemName, initialPrice, itemInfo, userId });
 
 	if (auction.status === false) return res.error.NotAcceptable(auction.message);
 
@@ -30,7 +31,7 @@ const BidOnAuction = Wrapper(async function (req, res) {
 	if (!auctionChain) return res.error.NotFound("No auction is going on for bid");
 
 	const { BidAmount } = req.body;
-	const userId = Math.floor(Math.random() * (10 - 1)) + 1 || req.user._id;
+	const userId = req.user._id;
 
 	if (auctionChain.isChainValid()) {
 		if (Number(BidAmount) > Number(auctionChain.getGenesisBlock().data.initialPrice)) {
@@ -86,4 +87,5 @@ const CloseAuction = Wrapper(async function (req, res) {
 	res.success.OK("Your bid is now closed", responseToSend);
 });
 
+const FetchAllMyAuctions = Wrapper();
 module.exports = { InitializeAuction, BidOnAuction, CloseAuction };

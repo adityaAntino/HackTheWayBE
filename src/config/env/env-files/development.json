@@ -5,6 +5,6 @@
 		"db": "mongodb+srv://kshitijbajpai:Cfgf41MqL40vqEoe@cluster0.djrj0f4.mongodb.net/"
 	},
 	"JWT_TOKEN": "PHg4zQ}Cj^sEGev$Fn#3NTha=O,BQ&azRZs%Qi)B3G=pRaV(1~",
-	"TWILIO_ACCOUNT_SID": "AC0a473097d10e2baae0299cc62866dbda",
-	"TWILIO_AUTH_TOKEN": "dece9e0894d886c69b46df95e4a3074d"
+	"TWILIO_ACCOUNT_SID": "",
+	"TWILIO_AUTH_TOKEN": ""
 }

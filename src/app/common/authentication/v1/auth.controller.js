@@ -36,7 +36,33 @@ const VerifyOTP = Wrapper(async (req, res) => {
 	res.success.OK(response.message, { token, user: user.data });
 });
 
+const VerifyToken = Wrapper(async (req, res, next) => {
+	if (!req.headers.authorization) return res.error.BadRequest("No token found in authorization header!");
+
+	if (!req.headers.authorization.startsWith("Bearer "))
+		return res.error.BadRequest("Token format not correct !! Only Bearer token is accepted");
+
+	const idToken = req.headers.authorization.split("Bearer ")[1];
+
+	const platform = req.get("Platform");
+
+	try {
+		const decodedToken = jwt.verify(idToken, env.TOKEN_KEY);
+
+		const userInDb = await UserService.GetUserFromMobile({ mobileNo: decodedToken.mobileNo, userType: platform });
+
+		if (!userInDb) return res.error.BadRequest(`No user found with ${decodedToken.mobileNo} Phone Number`);
+
+		req.user = userInDb;
+		next();
+	} catch (err) {
+		return res.error.Unauthorized(err);
+	}
+});
+
+
 module.exports = {
 	SendOTP,
 	VerifyOTP,
+	VerifyToken,
 };
