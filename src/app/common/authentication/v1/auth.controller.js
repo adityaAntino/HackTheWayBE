@@ -11,20 +11,20 @@ const SendOTP = Wrapper(async (req, res) => {
 
 	const response = await sendOTP(mobileNo);
 	if (response.status == true) return res.success.OK(response.message);
-	return res.error.BadRequest(response.message);
+	res.error.BadRequest(response.message);
 });
 
 const VerifyOTP = Wrapper(async (req, res) => {
 	const { mobileNo, otp } = req.body;
+	const platform = req.get("Platform");
 
 	const response = await verifyOTP(mobileNo, otp);
-
 	if (response.status == false) return res.error.BadRequest(response.message);
 
-	let user = await UserService.GetUserFromMobile(mobileNo);
+	let user = await UserService.GetUserFromMobile({ mobileNo, userType: platform });
 
 	if (user.status === false) {
-		const response = await UserService.AddNewUser(mobileNo);
+		const response = await UserService.AddNewUser({ mobileNo, userType: platform });
 		if (response.status === false) return res.error.BadRequest(response.message);
 		user = response;
 	}
@@ -33,7 +33,7 @@ const VerifyOTP = Wrapper(async (req, res) => {
 		expiresIn: "30d",
 	});
 
-	return res.success.OK(response.message, { token, user: user.data });
+	res.success.OK(response.message, { token, user: user.data });
 });
 
 module.exports = {

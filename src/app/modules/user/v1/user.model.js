@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema(
 		},
 		userType: {
 			type: String,
-			enum: ["bidder", "auctioneer", "admin"],
+			enum: ["user", "admin"],
 			default: "bidder",
 		},
 	},
