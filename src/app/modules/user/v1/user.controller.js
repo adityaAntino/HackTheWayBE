@@ -29,4 +29,9 @@ const FetchAllMyBids = Wrapper(async function (req, res) {
 	if (fetchMyBids.status === false) return res.error.NotFound("No data Found");
 	res.success.OK("Fetched Successfully", fetchMyBids.data);
 });
-module.exports = { PatchUser, FetchAllMyAuctions, FetchAllMyBids };
+
+const GetUser = Wrapper(async function (req, res) {
+	res.success.OK("Fetched Successfully", req.user);
+});
+
+module.exports = { PatchUser, FetchAllMyAuctions, FetchAllMyBids, GetUser };

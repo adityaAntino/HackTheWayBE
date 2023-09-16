@@ -15,10 +15,10 @@ const addNewAuction = async function ({ itemName, initialPrice, itemInfo, userId
 	return Response(true, "New Auction Created", auction);
 };
 
-const editAuction = async function (id, { chain, winningBid }) {
+const editAuction = async function (id, { chain, winningBid, status }) {
 	const auction = await AuctionModel.findByIdAndUpdate(
 		mongoose.Types.ObjectId(id),
-		{ chain, winningBid },
+		{ chain, winningBid, status },
 		{ new: true }
 	);
 
@@ -28,9 +28,7 @@ const editAuction = async function (id, { chain, winningBid }) {
 
 const fetchAllAuctions = async function (userId) {
 	const auctions = await AuctionModel.find({ auctioneer: mongoose.Types.ObjectId(userId) });
-
-	if (!auctions) return Response(false, "Error in fetching auction");
-	else if (!auctions.length) return Response(false, "No data found");
+	if (!auctions.length) return Response(false, "Error in fetching auction");
 	return Response(true, "Auction is fetched", auctions);
 };
 
@@ -47,10 +45,30 @@ const fetchAllBids = async function (userId) {
 };
 
 const fetchAuctions = async function () {
-	let auctions = await AuctionModel.find();
+	let auctions = await AuctionModel.find().populate("auctioneer");
+
+	auctions = auctions.map((elem) => {
+		return { ...elem._doc, auctioneer: elem.auctioneer.name };
+	});
 
 	if (!auctions) return Response(false, "Error in fetching auction");
 	else if (!auctions.length) return Response(false, "No data found");
+	return Response(true, "Auction is fetched", auctions);
+};
+
+const auctionStatusCount = async function () {
+	let auctions = Promise.all([
+		AuctionModel.find({ status: blockChainStatus.start }).countDocuments(),
+		AuctionModel.find({ status: blockChainStatus.running }).countDocuments(),
+		AuctionModel.find({ status: blockChainStatus.end }).countDocuments(),
+	]);
+
+	auctions = {
+		[blockChainStatus.start]: auctions[0] || 0,
+		[blockChainStatus.running]: auctions[1] || 0,
+		[blockChainStatus.end]: auctions[2] || 0,
+	};
+
 	return Response(true, "Auction is fetched", auctions);
 };
 
@@ -69,7 +87,6 @@ const addBidder = async function (auctionId, userId) {
 	if (!auction) Response(false, "No auction found");
 	return Response(true, "Bidder is added", auction);
 };
-
 
 const FetchAllAuctions = async function (offset, limit, match, query) {
 	const auctions = await AuctionModel.aggregate([
@@ -127,4 +144,5 @@ module.exports = {
 	fetchAllBids,
 	fetchAuctions,
 	FetchAllAuctions,
+	auctionStatusCount,
 };

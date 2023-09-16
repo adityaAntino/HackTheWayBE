@@ -14,9 +14,9 @@ userRouter.get("/:auctionId/bid-count", _controller.GetBidCount);
 userRouter.post("/:auctionId/close", _controller.CloseAuction);
 userRouter.get("/", _controller.FetchCurrentRunningAuctions);
 
-// userRouter.get("/open", _controller.FetchCurrentRunningAuctions);
 
 adminRouter.get("/", _controller.FetchAllAuctions);
+adminRouter.get("/auction-count", _controller.FetchAllAuctionsCount);
 
 module.exports = (app) => {
 	app.use(prefix, (req, res, next) => {

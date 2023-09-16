@@ -60,14 +60,13 @@ class Blockchain {
 	}
 
 	getTheHighestBidder() {
-		let user = null;
+		let user = this.getGenesisBlock().data.auctioneer;
 		let bidAmount = Number(this.getGenesisBlock().data.initialPrice);
 
 		if (!this.isChainValid()) return Response(false, "There is an issue with chain validity");
 
 		this.chain.map((elem) => {
 			if (elem.data?.amount) {
-				console.log(elem);
 				const bid = Number(elem.data.amount);
 
 				if (bidAmount < bid) {
@@ -76,8 +75,6 @@ class Blockchain {
 				}
 			}
 		});
-
-		if (!user) return Response(false, "No bid is placed");
 
 		return Response(true, "Success", { user, bidAmount });
 	}

@@ -85,9 +85,6 @@ const CloseAuction = Wrapper(async function (req, res) {
 	if (!blockchain) return res.error.NotFound("No auction Found");
 
 	const response = blockchain.getTheHighestBidder();
-	if (response.status === false) {
-		return res.error.BadRequest(response.message);
-	}
 
 	const { user, bidAmount } = response.data;
 
@@ -107,9 +104,6 @@ const CloseAuction = Wrapper(async function (req, res) {
 	await closeAuctionAndMarkNull(userData, bidAmount, blockchain);
 	res.success.OK("Your bid is now closed", responseToSend);
 });
-
-
-
 
 const FetchCurrentRunningAuctions = Wrapper(async function (req, res) {
 	const allRunningBlockchains = await _service.fetchAuctions();
@@ -137,7 +131,6 @@ const GetBidCount = Wrapper(async function (req, res) {
 	if (!blockchain) return res.error.NotFound("No auction Found");
 
 	const response = blockchain.getChain().length - 1;
-	if (!response) return res.error.BadRequest(response.message);
 
 	res.success.OK("Fetched count", { count: response });
 });
@@ -153,6 +146,12 @@ const closeAuctionAndMarkNull = async function (userData, bidAmount, blockchain)
 
 	deleteEntry(auctionId);
 };
+
+const FetchAllAuctionsCount = Wrapper(async function (req, res) {
+	const auctions = await _service.auctionStatusCount();
+	res.success.OK("Success", auctions.data);
+});
+
 module.exports = {
 	InitializeAuction,
 	BidOnAuction,
@@ -160,4 +159,5 @@ module.exports = {
 	FetchCurrentRunningAuctions,
 	FetchAllAuctions,
 	GetBidCount,
+	FetchAllAuctionsCount,
 };

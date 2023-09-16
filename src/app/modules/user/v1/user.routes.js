@@ -8,11 +8,13 @@ const prefix = "/api/v1/user";
 const userRouter = express.Router();
 const adminRouter = express.Router();
 
+userRouter.get("/", _controller.GetUser);
 userRouter.patch("/", _controller.PatchUser);
 userRouter.get("/auctions", _controller.FetchAllMyAuctions);
 userRouter.get("/bids", _controller.FetchAllMyBids);
 
 adminRouter.patch("/", _controller.PatchUser);
+adminRouter.get("/", _controller.GetUser);
 
 // adminRouter.get("/", _controller.FetchAllAuctions);
 
