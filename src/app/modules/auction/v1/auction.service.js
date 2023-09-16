@@ -31,4 +31,26 @@ const fetchAllAuctions = async function (userId) {
 	return Response(true, "Auction is fetched", auctions);
 };
 
-module.exports = { addNewAuction, editAuction, fetchAllAuctions };
+const fetchAllBids = async function (userId) {
+	const auctions = await AuctionModel.find({ bidder: mongoose.Types.ObjectId(userId) });
+
+	if (!auctions) return Response(false, "Error in fetching auction");
+	else if (!auctions.length) return Response(false, "No data found");
+	return Response(true, "Auction is fetched", auctions);
+};
+
+const addBidder = async function (auctionId, userId) {
+	const auction = await AuctionModel.findOneAndUpdate(
+		{
+			_id: mongoose.Types.ObjectId(auctionId),
+		},
+		{
+			$push: {
+				bidder: mongoose.Types.ObjectId(userId),
+			},
+		}
+	);
+	if (!auction) Response(false, "No auction found");
+	return Response(true, "Bidder is added", auction);
+};
+module.exports = { addNewAuction, editAuction, fetchAllAuctions, addBidder, fetchAllBids };

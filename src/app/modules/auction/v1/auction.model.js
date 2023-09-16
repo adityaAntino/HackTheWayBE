@@ -7,6 +7,14 @@ const auctionSchema = new mongoose.Schema(
 			type: mongoose.Types.ObjectId,
 			ref: "user",
 		},
+		bidder: {
+			type: [
+				{
+					type: mongoose.Types.ObjectId,
+					ref: "user",
+				},
+			],
+		},
 		itemDescription: {
 			type: {
 				itemName: String,
