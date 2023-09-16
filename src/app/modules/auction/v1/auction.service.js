@@ -47,7 +47,7 @@ const fetchAllBids = async function (userId) {
 };
 
 const fetchAuctions = async function () {
-	let auctions = await AuctionModel.find({ status: blockChainStatus.running });
+	let auctions = await AuctionModel.find();
 
 	if (!auctions) return Response(false, "Error in fetching auction");
 	else if (!auctions.length) return Response(false, "No data found");

@@ -108,21 +108,8 @@ const CloseAuction = Wrapper(async function (req, res) {
 	res.success.OK("Your bid is now closed", responseToSend);
 });
 
-const FetchAllMyAuctions = Wrapper(async function (req, res) {
-	const userId = req.user._id;
-	const fetchMyAuctions = await _service.fetchAllAuctions(userId);
 
-	if (fetchMyAuctions.status === false) return res.error.NotFound("No data Found");
-	res.success.OK("Fetched Successfully", fetchMyAuctions.data);
-});
 
-const FetchAllMyBids = Wrapper(async function (req, res) {
-	const userId = req.user._id;
-	const fetchMyBids = await _service.fetchAllBids(userId);
-
-	if (fetchMyBids.status === false) return res.error.NotFound("No data Found");
-	res.success.OK("Fetched Successfully", fetchMyBids.data);
-});
 
 const FetchCurrentRunningAuctions = Wrapper(async function (req, res) {
 	const allRunningBlockchains = await _service.fetchAuctions();
@@ -131,8 +118,6 @@ const FetchCurrentRunningAuctions = Wrapper(async function (req, res) {
 
 	res.success.OK("Fetched Succefully", allRunningBlockchains.data);
 });
-
-
 
 const FetchAllAuctions = Wrapper(async function (req, res) {
 	const { page = 1, limit = 15, match = "", status = blockChainStatus.end } = req.query;
@@ -172,9 +157,7 @@ module.exports = {
 	InitializeAuction,
 	BidOnAuction,
 	CloseAuction,
-	FetchAllMyAuctions,
 	FetchCurrentRunningAuctions,
-	FetchAllMyBids,
 	FetchAllAuctions,
 	GetBidCount,
 };

@@ -9,6 +9,8 @@ const userRouter = express.Router();
 const adminRouter = express.Router();
 
 userRouter.patch("/", _controller.PatchUser);
+userRouter.get("/auctions", _controller.FetchAllMyAuctions);
+userRouter.get("/bids", _controller.FetchAllMyBids);
 
 adminRouter.patch("/", _controller.PatchUser);
 
