@@ -23,4 +23,9 @@ const AddNewUser = async function ({ mobileNo, userType }) {
 	return Response(true, "Success", user);
 };
 
-module.exports = { GetSingleUser, GetUserFromMobile, AddNewUser };
+const editUser = async function (id, userObject) {
+	const user = await UserModel.findByIdAndUpdate(mongoose.Types.ObjectId(id), userObject, { new: true });
+	if (!user) return Response(false, "No user found to update");
+	return Response(true, "Success", user);
+};
+module.exports = { GetSingleUser, GetUserFromMobile, AddNewUser, editUser };

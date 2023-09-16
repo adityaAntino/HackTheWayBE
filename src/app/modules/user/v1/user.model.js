@@ -9,6 +9,8 @@ const userSchema = new mongoose.Schema(
 		mobileNo: {
 			type: String,
 		},
+		gender: String,
+		email: String,
 		userType: {
 			type: String,
 			enum: ["user", "admin"],

@@ -16,6 +16,7 @@ module.exports = () => {
 
 	require("../app/common/authentication/v1/auth.routes")(app);
 	require("../app/modules/auction/v1/auction.routes")(app);
+	require("../app/modules/user/v1/user.routes")(app);
 
 	const PORT = config.port ? config.port : process.env.PORT;
 	app.get("/", (req, res) => {

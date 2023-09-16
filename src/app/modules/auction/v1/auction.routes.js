@@ -26,7 +26,7 @@ module.exports = (app) => {
 		};
 
 		const AdminRoutes = function () {
-			VerifyToken(req, res, () => userRouter(req, res, next));
+			VerifyToken(req, res, () => adminRouter(req, res, next));
 		};
 
 		if (apiSource === "user") UserRoutes();
