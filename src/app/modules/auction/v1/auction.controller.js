@@ -21,6 +21,7 @@ const InitializeAuction = Wrapper(async function (req, res) {
 		initialPrice,
 		itemInfo,
 		auctionId: auction.data._id,
+		auctioneer: userId,
 		status: blockChainStatus.start,
 	});
 
@@ -32,6 +33,11 @@ const BidOnAuction = Wrapper(async function (req, res) {
 
 	const { BidAmount } = req.body;
 	const userId = req.user._id;
+
+	const auctioneerId = auctionChain.getGenesisBlock().data.auctioneer;
+
+	if (userId.toString() == auctioneerId.toString())
+		return res.error.NotAcceptable("You cannot place bid in your own auction");
 
 	if (auctionChain.isChainValid()) {
 		if (Number(BidAmount) > Number(auctionChain.getGenesisBlock().data.initialPrice)) {
@@ -54,15 +60,13 @@ const CloseAuction = Wrapper(async function (req, res) {
 	if (!auctionChain) return res.error.NotFound("No auction Found");
 
 	const response = auctionChain.getTheHighestBidder();
-	if (response.status === false) {
-		return res.error.BadRequest(response.message);
-	}
+	if (response.status === false) return res.error.BadRequest(response.message);
 
 	const { user, bidAmount } = response.data;
 
 	const userData = await UserService.GetSingleUser(user);
 
-	if (userData.status === false) return res.error.BadRequest("Your Bid is closed but the matching user is not found");
+	if (userData.status === false) return res.error.BadRequest("No User found");
 
 	const responseToSend = {
 		userName: userData.data.name,
@@ -75,9 +79,6 @@ const CloseAuction = Wrapper(async function (req, res) {
 
 	const auctionId = auctionChain.getGenesisBlock().data.auctionId;
 
-	console.log(auctionId, userData);
-	console.log(auctionChain.getChain());
-
 	await _service.editAuction(auctionId, {
 		chain: auctionChain.getChain(),
 		winningBid: { user: userData.data._id, amount: bidAmount },
@@ -87,5 +88,12 @@ const CloseAuction = Wrapper(async function (req, res) {
 	res.success.OK("Your bid is now closed", responseToSend);
 });
 
-const FetchAllMyAuctions = Wrapper();
-module.exports = { InitializeAuction, BidOnAuction, CloseAuction };
+const FetchAllMyAuctions = Wrapper(async function (req, res) {
+	const userId = req.user._id;
+	const fetchMyAuctions = await _service.fetchAllAuctions(userId);
+
+	if (fetchMyAuctions.status === false) return res.error.NotFound("No data Found");
+	res.success.OK("Fetched Successfully", fetchMyAuctions.data);
+});
+
+module.exports = { InitializeAuction, BidOnAuction, CloseAuction, FetchAllMyAuctions };

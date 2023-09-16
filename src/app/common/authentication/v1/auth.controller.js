@@ -47,16 +47,16 @@ const VerifyToken = Wrapper(async (req, res, next) => {
 	const platform = req.get("Platform");
 
 	try {
-		const decodedToken = jwt.verify(idToken, env.TOKEN_KEY);
+		const decodedToken = jwt.verify(idToken, env.JWT_TOKEN);
 
 		const userInDb = await UserService.GetUserFromMobile({ mobileNo: decodedToken.mobileNo, userType: platform });
 
 		if (!userInDb) return res.error.BadRequest(`No user found with ${decodedToken.mobileNo} Phone Number`);
 
-		req.user = userInDb;
+		req.user = userInDb.data;
 		next();
 	} catch (err) {
-		return res.error.Unauthorized(err);
+		return res.error.Unauthorized("Not Authorized", err);
 	}
 });
 

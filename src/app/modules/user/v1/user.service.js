@@ -14,8 +14,8 @@ const GetSingleUser = async function (id) {
 };
 
 
-const GetUserFromMobile = async function (mobileNo) {
-	const user = await UserModel.findOne({ mobileNo });
+const GetUserFromMobile = async function ({ mobileNo, userType }) {
+	const user = await UserModel.findOne({ mobileNo, userType });
 	if (!user) return Response(false, "No user found");
 	return Response(true, "Success", user);
 };

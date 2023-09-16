@@ -13,7 +13,7 @@ userRouter.post("/bid", _controller.BidOnAuction);
 userRouter.post("/bid/close", _controller.CloseAuction);
 userRouter.get("/", _controller.FetchAllMyAuctions);
 
-adminRouter.get("/", _controller.FetchAllAuctions);
+// adminRouter.get("/", _controller.FetchAllAuctions);
 
 module.exports = (app) => {
 	app.use(prefix, (req, res, next) => {

@@ -22,7 +22,6 @@ const verifyOTP = async (mobileNo, otp) => {
 		const response = await client.verify.v2
 			.services(env.VERIFY_SERVICE_SID)
 			.verificationChecks.create({ to: `+91${mobileNo}`, code: `${otp}` });
-		// console.log("OTP VERIFY  response ===>", response);
 
 		if (response && response.status === "approved") {
 			return Response(true, "OTP verified successfully", { data: {} });

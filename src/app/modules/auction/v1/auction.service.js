@@ -22,4 +22,14 @@ const editAuction = async function (id, { chain, winningBid }) {
 	if (!auction) return Response(false, "Error in editing auction");
 	return Response(true, "Auction is updated", auction);
 };
-module.exports = { addNewAuction, editAuction };
+
+const fetchAllAuctions = async function (userId) {
+	console.log(userId);
+	const auctions = await AuctionModel.find({ auctioneer: mongoose.Types.ObjectId(userId) });
+
+	if (!auctions) return Response(false, "Error in fetching auction");
+	else if (!auctions.length) return Response(false, "No data found");
+	return Response(true, "Auction is fetched", auctions);
+};
+
+module.exports = { addNewAuction, editAuction, fetchAllAuctions };

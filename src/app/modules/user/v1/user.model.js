@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema(
 		userType: {
 			type: String,
 			enum: ["user", "admin"],
-			default: "bidder",
+			default: "user",
 		},
 	},
 	{ timestamps: true }
