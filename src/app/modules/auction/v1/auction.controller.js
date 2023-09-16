@@ -1,9 +1,11 @@
+const moment = require("moment");
+
 const _service = require("./auction.service");
 const { Wrapper } = require("../../../common/helpers/serviceResponse.Handler");
-const { Blockchain, Block } = require("../../../common/utils/blockchain/blockchain");
+const { Blockchain, Block } = require("../../../common/utils/blockchain");
 const { blockChainStatus } = require("../../../common/utils/enums");
 const UserService = require("../../user/v1/user.service");
-const moment = require("moment");
+const { getValue, setEntry, deleteEntry } = require("../../../common/cache/cache");
 
 let auctionChain = null;
 
@@ -15,11 +17,18 @@ const InitializeAuction = Wrapper(async function (req, res) {
 
 	const endtime = moment().add(duration, "hours").format("DD-MM-YYYYTHH:mm:ss") + "Z";
 
-	const auction = await _service.addNewAuction({ itemName, initialPrice, itemInfo, userId });
+	const auction = await _service.addNewAuction({
+		itemName,
+		initialPrice,
+		itemInfo,
+		userId,
+		endTime: endtime,
+		status: blockChainStatus.start,
+	});
 
 	if (auction.status === false) return res.error.NotAcceptable(auction.message);
 
-	auctionChain = new Blockchain({
+	const val = new Blockchain({
 		itemName,
 		initialPrice,
 		itemInfo,
@@ -29,18 +38,22 @@ const InitializeAuction = Wrapper(async function (req, res) {
 		status: blockChainStatus.start,
 	});
 
+	setEntry(auction.data._id, val);
+
 	res.success.Created("Auction has started");
 });
 
 const BidOnAuction = Wrapper(async function (req, res) {
-	if (!auctionChain) return res.error.NotFound("No auction is going on for bid");
+	const id = req.params.auctionId;
+	const blockchain = getValue(id);
+	if (!blockchain) return res.error.NotFound("No auction is going on for bid");
 
 	const { BidAmount } = req.body;
 	const userId = req.user._id;
 
-	const { auctioneer: auctioneerId, auctionId, initialPrice } = auctionChain.getGenesisBlock().data;
+	const { auctioneer: auctioneerId, auctionId, initialPrice } = blockchain.getGenesisBlock().data;
 
-	const endtime = auctionChain.getGenesisBlock().data.endTime;
+	const endtime = blockchain.getGenesisBlock().data.endTime;
 	const currentTime = moment().format("DD-MM-YYYYTHH:mm:ss") + "Z";
 
 	if (endtime < currentTime) {
@@ -53,15 +66,14 @@ const BidOnAuction = Wrapper(async function (req, res) {
 	if (userId.toString() == auctioneerId.toString())
 		return res.error.NotAcceptable("You cannot place bid in your own auction");
 
-	if (auctionChain.isChainValid()) {
-		if (Number(BidAmount) > Number(auctionChain.getGenesisBlock().data.initialPrice)) {
-			auctionChain.addBlock(
-				new Block(null, null, { amount: BidAmount, userId, status: blockChainStatus.running })
-			);
+	if (blockchain.isChainValid()) {
+		if (Number(BidAmount) > Number(blockchain.getGenesisBlock().data.initialPrice)) {
+			blockchain.addBlock(new Block(null, null, { amount: BidAmount, userId, status: blockChainStatus.running }));
+			setEntry(auctionId, blockchain);
 			await _service.addBidder(auctionId, userId);
 		} else {
 			return res.error.BadRequest(
-				`Your bid amount should be greater than ${auctionChain.getGenesisBlock().data.initialPrice}`
+				`Your bid amount should be greater than ${blockchain.getGenesisBlock().data.initialPrice}`
 			);
 		}
 	} else {
@@ -72,9 +84,11 @@ const BidOnAuction = Wrapper(async function (req, res) {
 });
 
 const CloseAuction = Wrapper(async function (req, res) {
-	if (!auctionChain) return res.error.NotFound("No auction Found");
+	const id = req.params.auctionId;
+	const blockchain = getValue(id);
+	if (!blockchain) return res.error.NotFound("No auction Found");
 
-	const response = auctionChain.getTheHighestBidder();
+	const response = blockchain.getTheHighestBidder();
 	if (response.status === false) {
 		return res.error.BadRequest(response.message);
 	}
@@ -90,11 +104,11 @@ const CloseAuction = Wrapper(async function (req, res) {
 		highestBidPlaced: bidAmount,
 	};
 
-	auctionChain.addBlock(
+	blockchain.addBlock(
 		new Block(null, null, { userName: userData.data.name, bidAmount, status: blockChainStatus.end })
 	);
 
-	await closeAuctionAndMarkNull(userData, bidAmount);
+	await closeAuctionAndMarkNull(userData, bidAmount, blockchain);
 	res.success.OK("Your bid is now closed", responseToSend);
 });
 
@@ -115,24 +129,24 @@ const FetchAllMyBids = Wrapper(async function (req, res) {
 });
 
 const FetchCurrentRunningAuctions = Wrapper(async function (req, res) {
-	if (!auctionChain) return res.error.NotFound("No auction Found");
+	const allRunningBlockchains = await _service.fetchAuctions();
 
-	const auctionData = auctionChain.getGenesisBlock().data;
-	const owner = await UserService.GetSingleUser(auctionData.auctioneer);
+	if (!allRunningBlockchains) return res.error.NotFound("No Running auction found");
 
-	if (owner.status === false) return res.error.BadRequest("No Auctioneer found");
-
-	auctionData.owner = owner.data.name;
-
-	const arrToReturn = [];
-	let data = 7;
-
-	while (data > 0) {
-		arrToReturn.push(auctionData);
-		data -= 1;
-	}
-	res.success.OK("Fetched Succefully", arrToReturn);
+	res.success.OK("Fetched Succefully", allRunningBlockchains.data);
 });
+
+const closeAuctionAndMarkNull = async function (userData, bidAmount, blockchain) {
+	const auctionId = blockchain.getGenesisBlock().data.auctionId;
+
+	await _service.editAuction(auctionId, {
+		chain: blockchain.getChain(),
+		winningBid: { user: userData.data._id, amount: bidAmount },
+		status: blockChainStatus.end,
+	});
+
+	deleteEntry(auctionId);
+};
 
 module.exports = {
 	InitializeAuction,
@@ -142,14 +156,3 @@ module.exports = {
 	FetchCurrentRunningAuctions,
 	FetchAllMyBids,
 };
-const closeAuctionAndMarkNull = async function (userData, bidAmount) {
-	const auctionId = auctionChain.getGenesisBlock().data.auctionId;
-
-	await _service.editAuction(auctionId, {
-		chain: auctionChain.getChain(),
-		winningBid: { user: userData.data._id, amount: bidAmount },
-	});
-
-	auctionChain = null;
-};
-

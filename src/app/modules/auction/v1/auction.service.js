@@ -1,11 +1,14 @@
 const mongoose = require("mongoose");
 const AuctionModel = require("./auction.model");
 const { Response } = require("../../../common/helpers/serviceResponse.Handler");
+const { blockChainStatus } = require("../../../common/utils/enums");
 
-const addNewAuction = async function ({ itemName, initialPrice, itemInfo, userId }) {
+const addNewAuction = async function ({ itemName, initialPrice, itemInfo, userId, endTime, status }) {
 	const auction = await AuctionModel.create({
 		auctioneer: mongoose.Types.ObjectId(userId),
 		itemDescription: { itemName, initialPrice, itemInfo },
+		endTime,
+		status,
 	});
 
 	if (!auction) return Response(false, "Error in creating new auction");
@@ -32,7 +35,19 @@ const fetchAllAuctions = async function (userId) {
 };
 
 const fetchAllBids = async function (userId) {
-	const auctions = await AuctionModel.find({ bidder: mongoose.Types.ObjectId(userId) });
+	let auctions = await AuctionModel.find({ bidder: mongoose.Types.ObjectId(userId) });
+
+	auctions = auctions.map((elem) => {
+		return { ...elem._doc, won: elem.winningBid?.user.toString() == userId.toString() };
+	});
+
+	if (!auctions) return Response(false, "Error in fetching auction");
+	else if (!auctions.length) return Response(false, "No data found");
+	return Response(true, "Auction is fetched", auctions);
+};
+
+const fetchAuctions = async function () {
+	let auctions = await AuctionModel.find({ status: blockChainStatus.running });
 
 	if (!auctions) return Response(false, "Error in fetching auction");
 	else if (!auctions.length) return Response(false, "No data found");
@@ -48,9 +63,10 @@ const addBidder = async function (auctionId, userId) {
 			$push: {
 				bidder: mongoose.Types.ObjectId(userId),
 			},
+			status: blockChainStatus.running,
 		}
 	);
 	if (!auction) Response(false, "No auction found");
 	return Response(true, "Bidder is added", auction);
 };
-module.exports = { addNewAuction, editAuction, fetchAllAuctions, addBidder, fetchAllBids };
+module.exports = { addNewAuction, editAuction, fetchAllAuctions, addBidder, fetchAllBids, fetchAuctions };

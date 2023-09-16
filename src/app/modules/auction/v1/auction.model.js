@@ -14,7 +14,9 @@ const auctionSchema = new mongoose.Schema(
 					ref: "user",
 				},
 			],
+			select: false,
 		},
+		endTime: String,
 		itemDescription: {
 			type: {
 				itemName: String,
@@ -26,6 +28,7 @@ const auctionSchema = new mongoose.Schema(
 			type: Array,
 			select: false,
 		},
+		status: String,
 		winningBid: {
 			type: {
 				user: {

@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 const moment = require("moment");
-const { Response } = require("../../helpers/serviceResponse.Handler");
+const { Response } = require("../helpers/serviceResponse.Handler");
 
 class Block {
 	constructor(index, previousHash, data, timestamp = moment().format("DD/MM/YYYY-HH:mm:ss")) {
@@ -86,18 +86,5 @@ class Blockchain {
 		return this.chain;
 	}
 }
-
-// Create a blockchain instance
-// const myBlockchain = new Blockchain();
-
-// // Add some blocks
-// myBlockchain.addBlock(new Block(null, null, { amount: 10 }));
-// myBlockchain.addBlock(new Block(null, null, { amount: 5 }));
-
-// // Display the blockchain
-// console.log(JSON.stringify(myBlockchain, null, 2));
-
-// // Check if the blockchain is valid
-// console.log("Is blockchain valid?", myBlockchain.isChainValid());
 
 module.exports = { Blockchain, Block };

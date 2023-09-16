@@ -6,7 +6,8 @@ const terminate = require("./terminate");
 const app = express();
 const server = require("http").createServer(app);
 
-// clientConnection();
+
+
 connectDB();
 express();
 

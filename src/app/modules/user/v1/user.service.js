@@ -5,7 +5,7 @@ const { Response } = require("../../../common/helpers/serviceResponse.Handler");
 
 const GetSingleUser = async function (id) {
 	const user = await UserModel.findById(mongoose.Types.ObjectId(id));
-	user.name = "aditya";
+	user.name = user.name ?? "aditya";
 	if (!user) return Response(false, "No user found");
 	return Response(true, "Success", user);
 };
