@@ -13,4 +13,17 @@ const GetSingleUser = async function (id) {
 	return Response(true, "Success", user);
 };
 
-module.exports = { GetSingleUser };
+
+const GetUserFromMobile = async function (mobileNo) {
+	const user = await UserModel.findOne({ mobileNo });
+	if (!user) return Response(false, "No user found");
+	return Response(true, "Success", user);
+};
+
+const AddNewUser = async function (mobileNo) {
+	const user = await UserModel.create({ mobileNo });
+	if (!user) return Response(false, "No user found");
+	return Response(true, "Success", user);
+};
+
+module.exports = { GetSingleUser, GetUserFromMobile, AddNewUser };

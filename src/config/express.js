@@ -14,6 +14,7 @@ module.exports = () => {
 	app.use(responseHandler());
 	app.use(logger("dev"));
 
+	require("../app/common/authentication/v1/auth.routes")(app);
 	require("../app/modules/auction/v1/auction.routes")(app);
 
 	const PORT = config.port ? config.port : process.env.PORT;
