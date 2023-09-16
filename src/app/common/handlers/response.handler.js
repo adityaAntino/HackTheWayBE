@@ -142,25 +142,23 @@ let responseFactory = function (res, name, type) {
         // uncomment text to send response as a plain/text
         // text: () => res.send(response.toString()),
         json: () => {
-          // Delete the stack and query properties if is a production env.
-          if (!debug) {
-            delete response.stack;
-            delete response.query;
-          }
+			// Delete the stack and query properties if is a production env.
+			if (!debug) {
+				delete response.stack;
+				delete response.query;
+			}
 
-					if (res.responseTimeStart !== undefined) {
-						res.responseTimeEnd = process.hrtime();
-						response.time =
-							(res.responseTimeEnd[0] * 1000000 +
-								res.responseTimeEnd[1] -
-								(res.responseTimeStart[0] * 1000000 + res.responseTimeStart[1])) /
-							1000000;
-					}
+			if (res.responseTimeStart !== undefined) {
+				res.responseTimeEnd = process.hrtime();
+				response.time =
+					(res.responseTimeEnd[0] * 1000000 +
+						res.responseTimeEnd[1] -
+						(res.responseTimeStart[0] * 1000000 + res.responseTimeStart[1])) /
+					1000000;
+			}
 
-					
-					require("../../modules/logs/log.controller").LogMiddleware(res.req, response);
-					res.json(response);
-				},
+			res.json(response);
+		},
 				default: () => {
 					/**
 					 * If response.data and response.message equals to undefined

@@ -4,6 +4,7 @@ const responseHandler = require("./../app/common/handlers/response.handler");
 const config = require("./env/config");
 const logger = require("morgan");
 
+
 module.exports = () => {
 	const app = express();
 	app.use(express.json({ extended: false, limit: "50mb" }));
@@ -13,7 +14,7 @@ module.exports = () => {
 	app.use(responseHandler());
 	app.use(logger("dev"));
 
-	// require("../app/common/authentication/auth.routes")(app);
+	require("../app/modules/auction/v1/auction.routes")(app);
 
 	const PORT = config.port ? config.port : process.env.PORT;
 	app.get("/", (req, res) => {
