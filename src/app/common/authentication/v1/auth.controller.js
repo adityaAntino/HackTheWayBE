@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
-const env = require("../../../../config/env/config");
+const env = require('dotenv');
+env.config();
+// const env = require("../../../../config/env/config");
 
 const { Wrapper } = require("../../helpers/serviceResponse.Handler");
 const { sendOTP, verifyOTP } = require("../../utils/twillio");
@@ -29,7 +31,7 @@ const VerifyOTP = Wrapper(async (req, res) => {
 		user = response;
 	}
 
-	const token = await jwt.sign({ mobileNo }, env.JWT_TOKEN, {
+	const token = await jwt.sign({ mobileNo }, process.env.JWT_TOKEN, {
 		expiresIn: "30d",
 	});
 
@@ -47,7 +49,7 @@ const VerifyToken = Wrapper(async (req, res, next) => {
 	const platform = req.get("Platform");
 
 	try {
-		const decodedToken = jwt.verify(idToken, env.JWT_TOKEN);
+		const decodedToken = jwt.verify(idToken, process.env.JWT_TOKEN);
 
 		const userInDb = await UserService.GetUserFromMobile({ mobileNo: decodedToken.mobileNo, userType: platform });
 
