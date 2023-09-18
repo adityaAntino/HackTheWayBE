@@ -6,20 +6,21 @@ const { Response } = require("../helpers/serviceResponse.Handler");
 
 const sendOTP = async (mobileNo) => {
 	try {
-		// if (process.env.NODE_ENV != "production") return Response(true, "OTP sent successfully");
+		if (process.env.NODE_ENV != "production") return Response(true, "OTP sent successfully");
 
 		await client.verify.v2
 			.services(process.env.VERIFY_SERVICE_SID)
 			.verifications.create({ to: `+91${mobileNo}`, channel: "sms" });
 		return Response(true, "OTP sent successfully");
 	} catch (error) {
+		console.log(error);
 		return Response(false, "Error occurred during sending notification:", error);
 	}
 };
 
 const verifyOTP = async (mobileNo, otp) => {
 	try {
-		// if (process.env.NODE_ENV != "production") return Response(true, "OTP verified successfully", { data: {} });
+		if (process.env.NODE_ENV != "production") return Response(true, "OTP verified successfully", { data: {} });
 
 		const response = await client.verify.v2
 			.services(process.env.VERIFY_SERVICE_SID)
