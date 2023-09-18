@@ -6,7 +6,7 @@ const { Response } = require("../helpers/serviceResponse.Handler");
 
 const sendOTP = async (mobileNo) => {
 	try {
-		if (process.env.NODE_ENV != "production") return Response(true, "OTP sent successfully");
+	return Response(true, "OTP sent successfully");
 
 		// await client.verify.v2
 		// 	.services(process.env.VERIFY_SERVICE_SID)
@@ -20,7 +20,7 @@ const sendOTP = async (mobileNo) => {
 
 const verifyOTP = async (mobileNo, otp) => {
 	try {
-		if (process.env.NODE_ENV != "production") return Response(true, "OTP verified successfully", { data: {} });
+		return Response(true, "OTP verified successfully", { data: {} });
 
 		// const response = await client.verify.v2
 		// 	.services(process.env.VERIFY_SERVICE_SID)
