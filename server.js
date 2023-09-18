@@ -11,9 +11,10 @@ const server = require("http").createServer(app);
 connectDB();
 express();
 
-const PORT = config.port ? config.port : process.env.PORT;
+// const PORT = config.port ? config.port : process.env.PORT;
+const PORT =  process.env.PORT;
 
-server.listen(process.env.PORT || config.port, function () {
+server.listen(process.env.PORT || process.env.PORT, function () {
 	console.log("----------------------------------------------------------");
 	console.log("Server listening at port : " + PORT);
 	console.log("Time : " + new Date());

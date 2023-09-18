@@ -1,11 +1,11 @@
-{
-	"envName": "Development",
-	"port": 4000,
-	"db_connectionString": {
-		"db": "mongodb+srv://kshitijbajpai:Cfgf41MqL40vqEoe@cluster0.djrj0f4.mongodb.net/"
-	},
-	"JWT_TOKEN": "PHg4zQ}Cj^sEGev$Fn#3NTha=O,BQ&azRZs%Qi)B3G=pRaV(1~",
-	"TWILIO_ACCOUNT_SID": "AC49249b95b2ef9d2a6ba22dcca32422b1",
-	"TWILIO_AUTH_TOKEN": "2906a940c08950ec4518f809898714c0",
-	"VERIFY_SERVICE_SID":"VA3e955bfb8411263a2469ebc1fdc8d43c"
-}
+// {
+// 	"envName": "Development",
+// 	"port": 4000,
+// 	"db_connectionString": {
+// 		"db": "mongodb+srv://kshitijbajpai:Cfgf41MqL40vqEoe@cluster0.djrj0f4.mongodb.net/"
+// 	},
+// 	"JWT_TOKEN": "PHg4zQ}Cj^sEGev$Fn#3NTha=O,BQ&azRZs%Qi)B3G=pRaV(1~",
+// 	"TWILIO_ACCOUNT_SID": "AC49249b95b2ef9d2a6ba22dcca32422b1",
+// 	"TWILIO_AUTH_TOKEN": "2906a940c08950ec4518f809898714c0",
+// 	"VERIFY_SERVICE_SID":"VA3e955bfb8411263a2469ebc1fdc8d43c"
+// }

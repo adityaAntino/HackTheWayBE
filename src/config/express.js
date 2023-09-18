@@ -18,7 +18,7 @@ module.exports = () => {
 	require("../app/modules/auction/v1/auction.routes")(app);
 	require("../app/modules/user/v1/user.routes")(app);
 
-	const PORT = config.port ? config.port : process.env.PORT;
+	const PORT =  process.env.PORT;
 	app.get("/", (req, res) => {
 		return res.status(200).send("Server is running on Port - " + PORT);
 	});
